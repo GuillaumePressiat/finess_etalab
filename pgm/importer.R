@@ -1,6 +1,7 @@
 library(dplyr, warn.conflicts = FALSE)
 
-type_fichier <- 'cs1100507'
+type_fichier <- 'cs1100501'
+# type_fichier <- 'cs1100507'
 
 # fichier le plus récent du type précisé
 f <- list.files('data_origine/') %>% 
@@ -19,31 +20,48 @@ sections <- unique(format$section)
 w <- tibble(l = readr::read_lines(file.path('data_origine', f), 
                                   locale = readr::locale(encoding = "latin1")))
 
+section1 <- "structureet"
 u <- function(section1, labeler = FALSE){
   temp <- w %>% filter(grepl(section1, l))
   format_ <- format %>% filter(section == section1) %>% 
     mutate(name = ifelse(is.na(name), 'V1', name))
   
-  if (section1 == 'structure_et'){
+  if (section1 == 'structureet'){
     # ; en fin de ligne pour cette section, on rajoute une colonne avant de séparer pour éviter les warnings
-  temp_2 <- temp %>% tidyr::separate(l, into = c(format_$name, 'crlf'), sep = ";") %>% select(-crlf)
+    temp_2 <- temp %>% tidyr::separate(l, into = c(format_$name, 'crlf'), sep = ";") %>% select(-crlf)
+    if (labeler){
+      temp_2 <- sjlabelled::set_label(temp_2, format_$libelle)
+    }
+    return(temp_2 %>% select(-V1))
   } else if (section1 == 'geolocalisation'){
     # pas de ; en fin de ligne pour cette section
     temp_2 <- temp %>% tidyr::separate(l, into = format_$name, sep = ";")
+    if (labeler){
+      temp_2 <- sjlabelled::set_label(temp_2, format_$libelle)
+    }
+  } else if (section1 == 'structureej'){
+    
+    # ; en fin de ligne pour cette section, on rajoute une colonne avant de séparer pour éviter les warnings
+    temp_2 <- temp %>% tidyr::separate(l, into = c('V1', format_$name), sep = ";") %>% select(-V1)
+    if (labeler){
+      temp_2 <- sjlabelled::set_label(temp_2, format_$libelle)
+    }
   }
-  
-  
-  if (labeler){
-    temp_2 <- sjlabelled::set_label(temp_2, format_$libelle)
-  }
-  return(temp_2 %>% select(-V1))
+  return(temp_2)
 }
 
 bases <- sections %>% purrr::map(u, labeler = TRUE)
 
-finess_et <- bases %>% purrr::reduce(left_join, by = 'nofinesset', suffix = paste0('_', sections))
-glimpse(sample_n(finess_et, 40))
-
 fout <- stringr::str_replace(f, '\\.csv', '\\.rds')
 
+# Cas finess et
+finess_et <- bases %>% purrr::reduce(left_join, by = 'nofinesset', suffix = paste0('_', sections))
+glimpse(sample_n(finess_et, 40))
 readr::write_rds(finess_et, paste0('data_results/', fout))
+
+# Cas finess et
+finess_ej <- bases[[1]]
+glimpse(sample_n(finess_ej, 40))
+readr::write_rds(finess_ej, paste0('data_results/', fout))
+
+

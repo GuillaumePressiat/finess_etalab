@@ -1,0 +1,23 @@
+type;base;pattern;maxLength;minLength;enumeration;name;nillable;minOccurs;maxOccurs;section;libelle
+typeNumeroFiness;string;[0-9][0-9A-Z][0-9]{7};;;;nofiness;false;1;1;structureej;Numéro FINESS
+typeRaisonSociale;string;;38;1;;rs;false;1;1;structureej;Raison sociale
+typeRaisonSocialeLongue;string;;60;1;;rslongue;true;1;1;structureej;Raison sociale longue
+typeComplementRaisonSociale;string;;32;1;;complrs;true;1;1;structureej;Complément de raison sociale
+typeNumeroVoie;string;[0-9]{1,4};;;;numvoie;true;1;1;structureej;Numéro de voie
+typeTypeVoie;string;[A-Z]{1,4};;;;typvoie;true;1;1;structureej;Type de voie
+typeLibelleVoie;string;;27;1;;voie;true;1;1;structureej;Libellé de voie
+typeComplementVoie;string;;;;c("B", "C", "Q", "T");compvoie;true;1;1;structureej;Complément de voie
+typeComplementDistribution;string;;32;1;;compldistrib;true;1;1;structureej;Complément de distribution
+typeLieuDitBp;string;;32;1;;lieuditbp;true;1;1;structureej;Lieu-dit / BP
+typeCommune;string;[0-9]{3};;;;commune;false;1;1;structureej;Commune
+typeLigneAcheminement;string;[0-9]{5} [\s\S]{1,26};;;;ligneacheminement;false;1;1;structureej;Ligne d’acheminement (CodePostal+Lib commune)
+typeDepartement;string;[0-9][0-9A-Z];;;;departement;false;1;1;structureej;Département
+typeLibelleDepartement;string;;24;1;;libdepartement;false;1;1;structureej;Libellé département
+typeTelephone;string;[0-9]{10};;;;telephone;true;1;1;structureej;Téléphone
+typeStatutJuridique;string;[0-9]{2};;;;statutjuridique;false;1;1;structureej;Statut juridique
+typeLibelleStatutJuridique;string;;60;1;;libstatutjuridique;true;1;1;structureej;Libellé statut juridique
+typeCategorie;string;[0-9]{3};;;;categetab;true;1;1;structureej;Catégorie d'établissement
+typeLibelleCategorie;string;;60;1;;libcategetab;true;1;1;structureej;Libellé catégorie d'établissement
+typeSiren;string;[0-9]{9};;;;siren;true;1;1;structureej;Numéro de SIREN
+typeCodeApe;string;[0-9]{4}[A-Z];;;;codeape;true;1;1;structureej;Code APE
+typeDateCreation;date;;;;;datecrea;false;1;1;structureej;Date de création

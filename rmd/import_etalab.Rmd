@@ -37,7 +37,7 @@ Nous proposons un programme qui extrait du pdf les formats des fichiers et ainsi
 
 # Extraire les informations de formats des données du pdf
 
-Cette partie du Rmarkdown présente ce que réalise le programme `pgm/extraire_formats_2.R` pour l'extraction des établissements (structure et).
+Cette partie du Rmarkdown présente ce que réalise le programme `pgm/extraire_formats_2.R` pour l'extraction des établissements (structure et). Un autre programme permet de faire l'identique pour les entités juridiques `pgm/extraire_formats_ej.R`.
 
 ## Libellés et rangs des colonnes
 
@@ -71,6 +71,7 @@ dtttable(readr::read_csv2('data_results/formats/format_etalabcs1100507.csv',
 On importe la section finess, puis la section geolocalisation et on joint les deux.
 
 C'est ce que fait le programme `pgm/importer.R` en ajoutant également les libellés des colonnes.
+Ce programme permet aussi d'intégrer de manière générique le fichier des entités juridiques.
 
 # Ajout des coordonnées au format WGS84
 
@@ -116,7 +117,17 @@ ggplot() +
 
 On tire un échantillon dans la table pour en montrer un aperçu (glimpse) : 
 
+## Finess établissements géolocalisés 
 
 ```{r}
 glimpse(sample_n(finess_et_wgs_84, 500), width = 200)
 ```
+
+## Finess juridiques 
+
+```{r}
+juridiques <-readr::read_rds('data_results/etalab_cs1100501_stock_20180129-0431.rds')
+
+glimpse(sample_n(juridiques, 500), width = 200)
+```
+
