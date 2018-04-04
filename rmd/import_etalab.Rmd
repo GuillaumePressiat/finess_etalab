@@ -1,0 +1,122 @@
+---
+title: "Import des fichiers finess Etalab"
+date: "`r Sys.Date()`"
+output:
+  rmdformats::readthedown:
+    highlight: tango
+    lightbox: true
+---
+
+```{r include = FALSE}
+knitr::opts_knit$set(root.dir = '~/Documents/R/finess_etalab')
+knitr::opts_chunk$set(message=FALSE,
+                      warning=FALSE)
+dtttable <- function(x, n = 12) DT::datatable(x, extensions = 'Buttons', options = list(
+      #pageLength = nrow(df2()),
+      pageLength = n,
+      dom = 'Bfrtip',
+      buttons = c('copy', 'csv', 'excel', 'colvis')), rownames = F)
+```
+
+# Contexte
+
+Le site `data.gouv.fr` publie régulièrement une extraction de la base Finess des établissements de santé sous un format bien défini.
+
+Deux (ou trois) types d'extractions réalisées nous intéressent ici : 
+
+  - [finess et](https://www.data.gouv.fr/fr/datasets/finess-extraction-du-fichier-des-etablissements/#_) pour les structures (étabissements, ou entités géographiques)
+    - version avec géocodage
+    - version sans géocodage
+  - [finess ej](https://www.data.gouv.fr/fr/datasets/finess-extraction-des-entites-juridiques/) pour les entités juridiques
+
+Le format de ces données est diffusé en pdf et contient toutes les informations nécessaires à l'import des données.
+
+Nous proposons un programme qui extrait du pdf les formats des fichiers et ainsi automatise quasiment l'import des fichiers (un programme permet également de télécharger automatiquement les fichiers).
+
+
+
+# Extraire les informations de formats des données du pdf
+
+Cette partie du Rmarkdown présente ce que réalise le programme `pgm/extraire_formats_2.R` pour l'extraction des établissements (structure et).
+
+## Libellés et rangs des colonnes
+
+On identifie dans le pdf la partie liant les noms de colonnes à leurs libellés et rangs dans le fichier csv.
+
+## Partie XML hiérarchique
+
+On identifie dans le pdf la partie contenant le fichier xsd des données.
+
+Aperçu du fichier xsd :
+
+```{r}
+library(dplyr, warn.conflicts = FALSE)
+readr::read_lines('data_results/formats/format_etalabcs1100507.xsd') %>% 
+  head(20) %>% 
+  cat(sep = "\n")
+```
+
+## Résultat 
+
+On donne ici un aperçu des principales variables du fichier, sous forme tabulaire :
+
+```{r}
+dtttable(readr::read_csv2('data_results/formats/format_etalabcs1100507.csv', 
+                          locale = readr::locale(encoding = "latin1")) %>% 
+           select(section, name, type, libelle, base, pattern, rang))
+```
+
+# Import des données
+
+On importe la section finess, puis la section geolocalisation et on joint les deux.
+
+C'est ce que fait le programme `pgm/importer.R` en ajoutant également les libellés des colonnes.
+
+# Ajout des coordonnées au format WGS84
+
+Les coordonnées de géolocalisations des établissements de métropôle et de la Corse sont en projection Lambert 93, mais on trouve pour les DOM-TOM d'autres types de projections :
+
+```{r}
+finess_et <- readr::read_rds('data_results/etalab_cs1100507_stock_20180129-0428.rds')
+
+knitr::kable(finess_et %>% 
+  select(sourcecoordet) %>% 
+  mutate(proj = stringr::str_split_fixed(sourcecoordet, ",", n = 7)[,7]) %>% 
+  count(proj))
+```
+
+Nous allons ajouter deux colonnes contenant les coordonnées au format usuel pour des cartographies web : WGS84, ainsi tous les départements auront la même projection.
+
+C'est ce que fait le programme `pgm/ajout_coordonnees_wgs84.R`.
+
+
+# Cartographie des pharmacies d'officine en Île-de-France
+
+```{r}
+finess_et_wgs_84 <-readr::read_rds('data_results/etalab_cs1100507_stock_20180129-0428-wgs84.rds')
+
+pharmacies_idf <- finess_et_wgs_84 %>% 
+  filter(departement %in% c('75', '77', '78', '91', '92', '93', '94', '95'),
+         categetab == '620')
+
+
+library(ggplot2)
+ggplot() + 
+  geom_point(data = pharmacies_idf, 
+             aes(x = lon, y = lat,
+                 color = paste(departement, libdepartement, sep = " - "))) + 
+  coord_map() + 
+  ggthemes::theme_map() + 
+  ggthemes::scale_color_pander(name = "Département") +
+  theme(legend.position = "bottom") + 
+  ggtitle("Pharmacies d'offine en Île-de-France")
+```
+
+# Aperçu des données
+
+On tire un échantillon dans la table pour en montrer un aperçu (glimpse) : 
+
+
+```{r}
+glimpse(sample_n(finess_et_wgs_84, 500), width = 200)
+```

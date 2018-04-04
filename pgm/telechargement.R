@@ -17,4 +17,4 @@ d <- stringr::str_extract_all(urls_fic, '[0-9]{8}\\-[0-9]{6}')
 
 1:length(urls_fic) %>% 
   purrr::map(function(i){
-  GET(urls_fic[i], write_disk(file.path('data', f[i])))})
+  GET(urls_fic[i], write_disk(file.path('data_origine', f[i]), overwrite = TRUE))})
