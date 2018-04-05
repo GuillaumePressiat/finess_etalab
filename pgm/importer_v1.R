@@ -9,47 +9,38 @@ decouper <- function(section1, format, w, labeler = FALSE) {
   
   if (section1 == 'structureet') {
     # ; en fin de ligne pour cette section, on rajoute une colonne avant de séparer pour éviter les warnings
-    
-    readr::write_lines(temp$l, 'data_temp/temptemp')
-    temp_2 <- readr::read_delim('data_temp/temptemp', na = "NA", delim = ";",
-                                col_names = c(format_$name, 'crlf'), 
-                                col_types = readr::cols(.default = readr::col_character())) %>% 
-      select(-crlf) %>% 
+    temp_2 <-
+      temp %>% tidyr::separate(l, into = c(format_$name, 'crlf'), sep = ";" ) %>% select(-crlf)  %>% 
       mutate_at(vars(starts_with('date')), lubridate::as_date)
-      
+    
     if (labeler) {
       temp_2 <- sjlabelled::set_label(temp_2, format_$libelle)
     }
-    file.remove('data_temp/temptemp')
-    return(temp_2 %>% select(-V1))
+    
+    return(temp_2)
   } 
   else if (section1 == 'geolocalisation') {
     # pas de ; en fin de ligne pour cette section
-    
-    readr::write_lines(temp$l, 'data_temp/temptemp')
-    temp_2 <- readr::read_delim('data_temp/temptemp', delim = ";", na = "NA",
-                                col_names = format_$name, 
-                                col_types = readr::cols(.default = readr::col_character()))  %>% 
+    temp_2 <-
+      temp %>% tidyr::separate(l, into = format_$name, sep = ";")  %>% 
       mutate_at(vars(starts_with('coord')), as.numeric)  %>% 
       mutate_at(vars(starts_with('date')), lubridate::as_date)
     
     if (labeler) {
       temp_2 <- sjlabelled::set_label(temp_2, format_$libelle)
     }
-    file.remove('data_temp/temptemp')
+    
     return(temp_2 %>% select(-V1))
   } 
   else if (section1 == 'structureej') {
-    readr::write_lines(temp$l, 'data_temp/temptemp')
-    temp_2 <- readr::read_delim('data_temp/temptemp', delim = ";", na = "NA",
-                                col_names = c('V1', format_$name), 
-                                col_types = readr::cols(.default = readr::col_character()))  %>% 
+    temp_2 <-
+      temp %>% tidyr::separate(l, into = c('V1', format_$name), sep = ";")  %>% 
       mutate_at(vars(starts_with('date')), lubridate::as_date)
     
     if (labeler) {
       temp_2 <- sjlabelled::set_label(temp_2, c('V1 label', format_$libelle))
     }
-    file.remove('data_temp/temptemp')
+    
     return(temp_2 %>% select(-V1))
   }
 

@@ -1,7 +1,6 @@
 
 
-finess_et <- readr::read_rds('data_results/etalab_cs1100507_stock_20180129-0428.rds') %>% 
-  mutate_at(vars(starts_with('coord')), as.numeric)
+finess_et <- readr::read_rds('data_results/etalab_cs1100507_stock_20180129-0428.rds')
 
 convertir_proj <- function(p){
   
@@ -40,3 +39,4 @@ finess_et %>%
 finess_et_wgs84 <- projs %>% purrr::map(convertir_proj) %>% bind_rows()
 
 readr::write_rds(finess_et_wgs84, 'data_results/etalab_cs1100507_stock_20180129-0428-wgs84.rds')
+

@@ -6,3 +6,4 @@ data_origine/*.csv
 data_results/*.csv
 data_results/*.rds
 .DS_Store
+data_temp/temptemp

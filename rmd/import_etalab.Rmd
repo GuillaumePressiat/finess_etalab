@@ -91,9 +91,11 @@ Nous allons ajouter deux colonnes contenant les coordonnées au format usuel pou
 C'est ce que fait le programme `pgm/ajout_coordonnees_wgs84.R`.
 
 
-# Cartographie des pharmacies d'officine en Île-de-France
+# Cartographies 
 
-```{r}
+## Pharmacies d'officine en Île-de-France
+
+```{r dpi = 200, echo = TRUE}
 finess_et_wgs_84 <-readr::read_rds('data_results/etalab_cs1100507_stock_20180129-0428-wgs84.rds')
 
 pharmacies_idf <- finess_et_wgs_84 %>% 
@@ -110,8 +112,56 @@ ggplot() +
   ggthemes::theme_map() + 
   ggthemes::scale_color_pander(name = "Département") +
   theme(legend.position = "bottom") + 
-  ggtitle("Pharmacies d'offine en Île-de-France")
+  ggtitle("Pharmacies d'officine en Île-de-France")
 ```
+
+
+## Établissements rattachés à des CHU/CHR et CH en métropôle
+
+```{r dpi = 200, echo = TRUE}
+finess_et_wgs_84 <-readr::read_rds('data_results/etalab_cs1100507_stock_20180129-0428-wgs84.rds')
+
+etabs <- finess_et_wgs_84 %>% 
+  filter(categetab %in% c('101', '355'), !grepl('[A-Z]',departement))
+
+
+library(ggplot2)
+ggplot() + 
+  geom_point(data = etabs, 
+             aes(x = lon, y = lat,
+                 color = paste(categetab, libcategetab, sep = " - ")), 
+             alpha = 0.7, size = 2) + 
+  coord_map() + 
+  ggthemes::theme_map() + 
+  ggthemes::scale_color_pander(name = "") +
+  theme(legend.position = "bottom") + 
+  ggtitle("CH et CHR/CHU en métropôle")
+```
+
+## Établissements en Martinique
+
+```{r echo = TRUE}
+finess_et_wgs_84 <-readr::read_rds('data_results/etalab_cs1100507_stock_20180129-0428-wgs84.rds')
+
+martinique <- finess_et_wgs_84 %>% 
+  filter(departement == '9B')
+
+
+library(leaflet)
+leaflet() %>% 
+  addTiles( attribution = "Donn&eacutees : 
+<a href = 'https://www.data.gouv.fr/fr/search/?q=finess' target = '_blank'>Finess Etalab</a>") %>%
+      addProviderTiles("CartoDB.Positron") %>% 
+      addProviderTiles("Stamen.TonerLines", 
+                       options = providerTileOptions(opacity = 0.5)) %>% 
+       addProviderTiles("Stamen.Watercolor",options = providerTileOptions(opacity = 0.2)) %>% 
+  addCircleMarkers(lng = martinique$lon, lat = martinique$lat, radius = 5, 
+                   fill = TRUE,fillOpacity = 0.8,
+                   color = '#00802B', stroke = FALSE, 
+                   popup = paste0('<b>', martinique$rs, 
+                                  '</b><br><em>', martinique$libcategagretab, '</em>'))
+```
+
 
 # Aperçu des données
 
