@@ -36,7 +36,8 @@ finess_et %>%
   count(proj) %>% 
   pull(proj) -> projs
 
-finess_et_wgs84 <- projs %>% purrr::map(convertir_proj) %>% bind_rows()
+finess_et_wgs84 <- projs %>% purrr::map(convertir_proj) %>% bind_rows() %>% 
+  dplyr::arrange(nofinesset, nofinessej)
 
 readr::write_rds(finess_et_wgs84, 'data_results/etalab_cs1100507_stock_20180129-0428-wgs84.rds')
-
+readr::write_delim(finess_et_wgs84, 'data_results/etalab_cs1100507_stock_20180129-0428-wgs84.csv', delim = ";", na = "")

@@ -110,7 +110,10 @@ else if (type_fichier == 'cs1100501') {
   res <- bases[[1]]
 
 }
+
 readr::write_rds(res, paste0('data_results/', fout))
+readr::write_delim(res, paste0('data_results/', f), delim = ";", na = "")
+
 return(res)
 }
 
