@@ -66,7 +66,8 @@ importer <- function(type_fichier){
 f <- list.files('data_origine/') %>% 
   .[grepl('csv', .)] %>% 
   .[grepl(type_fichier, .)] %>% 
-  sort(decreasing = TRUE)
+  sort(decreasing = TRUE) %>% 
+  .[1]
 
 # lire la date dans le fichier
 dt <- stringr::str_extract(f, '[0-9]{8}')
@@ -104,8 +105,7 @@ if (type_fichier == 'cs1100507') {
   # Cas finess et
   res <-
     bases %>% purrr::reduce(left_join, by = 'nofinesset', suffix = paste0('_', sections))
-}
-else if (type_fichier == 'cs1100501') {
+} else if (type_fichier == 'cs1100501') {
   # Cas finess ej
   res <- bases[[1]]
 

@@ -1,6 +1,6 @@
 
 
-finess_et <- readr::read_rds('data_results/etalab_cs1100507_stock_20180129-0428.rds')
+finess_et <- readr::read_rds('data_results/etalab-cs1100507-stock-20200304-0416.rds')
 
 convertir_proj <- function(p){
   
@@ -40,5 +40,5 @@ finess_et %>%
 finess_et_wgs84 <- projs %>% purrr::map(convertir_proj) %>% bind_rows() %>% 
   dplyr::arrange(nofinesset, nofinessej)
 
-readr::write_rds(finess_et_wgs84, 'data_results/etalab_cs1100507_stock_20180129-0428-wgs84.rds')
-readr::write_delim(finess_et_wgs84, 'data_results/etalab_cs1100507_stock_20180129-0428-wgs84.csv', delim = ";", na = "")
+readr::write_rds(finess_et_wgs84, 'data_results/etalab-cs1100507-stock-20200304-0416-wgs84.rds')
+readr::write_delim(finess_et_wgs84, 'data_results/etalab-cs1100507-stock-20200304-0416-wgs84.csv', delim = ";", na = "")
